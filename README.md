@@ -38,7 +38,7 @@ This will compile your project and store the build artifacts in the `dist/` dire
 
 ## Deploying to GitHub Pages
 
-This repository deploys automatically from `main` using GitHub Actions. Rename the GitHub repository to `p-arcade`, then open **Settings → Pages** and set **Source** to **GitHub Actions**. The workflow builds the app with the repository subpath, adds a router fallback for direct links, and deploys the browser output.
+Before the first deployment, open **Settings → Pages** and set **Source** to **GitHub Actions**. This one-time setting must be enabled in repository settings because `GITHUB_TOKEN` cannot create the Pages site. Rename the GitHub repository to `p-arcade` if you want the `/p-arcade/` site URL. After setup, pushes to `main` deploy automatically. The workflow builds the app with the repository subpath and adds a router fallback for direct links.
 
 After the first successful workflow run, the site will be available at <https://vitoriaborba.github.io/p-arcade/>. Later pushes to `main` trigger a new deployment.
 
