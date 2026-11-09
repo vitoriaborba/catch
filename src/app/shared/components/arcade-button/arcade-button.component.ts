@@ -10,6 +10,8 @@ import { RouterLink } from '@angular/router';
 })
 export class ArcadeButtonComponent {
   @Input() href: string | null = null;
+  @Input() label = '';
+  @Input() icon: string | null = null;
   @Input() disabled = false;
   @Output() activated = new EventEmitter<void>();
 }

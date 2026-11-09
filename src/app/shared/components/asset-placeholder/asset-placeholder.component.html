@@ -1,4 +1,4 @@
-<div class="asset-frame" [class]="'asset-frame asset-frame--' + ratio">
+<div class="asset-frame" [class]="'asset-frame asset-frame--' + ratio" [class.asset-frame--filled]="asset.path !== null">
   @if (asset.path) {
     <img [src]="asset.path" [alt]="asset.label" />
   } @else {

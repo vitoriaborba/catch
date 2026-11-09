@@ -33,7 +33,7 @@
 .brand-mark span { color: var(--orange); }
 .brand-copy { display: grid; gap: 4px; }
 .brand-copy strong { font: 700 16px/1 Impact, 'Arial Narrow', sans-serif; }
-.brand-copy small,
+.brand-copy small { color: var(--ink-soft); font: 12px/1.4 'Courier New', monospace; }
 .cabinet-status { color: var(--ink-soft); font: 10px/1.4 'Courier New', monospace; }
 
 .cabinet-status { display: flex; align-items: center; gap: 8px; }

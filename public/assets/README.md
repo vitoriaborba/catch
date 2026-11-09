@@ -1,12 +1,16 @@
 # Arcade artwork
 
-Add the final PNG files at these paths, then set the matching `path` in `src/app/shared/assets/arcade-assets.ts`:
+The supplied PNGs are published in these locations and mapped in `src/app/shared/assets/arcade-assets.ts`:
 
-- `philippCharacter`: `/assets/philipp/philipp-character.png`
+- `philippCharacter` / `philippGameCharacter`: `/assets/philipp/philipp-basket.png`
 - `philippWetSock`: `/assets/philipp/philipp-wet-sock.png`
-- `philippGameCharacter`: `/assets/games/game-001/philipp-game-character.png`
+- `philippTaskDone`: `/assets/philipp/philipp-task-done.png`
+- `philippFailedTask`: `/assets/philipp/philipp-failed-task.png`
 - `blackSock`: `/assets/games/game-001/socks/black-sock.png`
-- `colourfulSock`: `/assets/games/game-001/socks/colourful-sock.png`
-- `laundryBasket`: `/assets/games/game-001/basket/laundry-basket.png`
+- `whiteSock`: `/assets/games/game-001/socks/white-sock.png`
+- `redSock`: `/assets/games/game-001/socks/red-sock.png`
+- `greenSock`: `/assets/games/game-001/socks/green-sock.png`
+- `blueSock`: `/assets/games/game-001/socks/blue-sock.png`
+- `yellowSock`: `/assets/games/game-001/socks/yellow-sock.png`
 
-Keep the current aspect-ratio settings on each placeholder when choosing image dimensions. A null path keeps the labeled development placeholder visible.
+The Philipp game sprite already includes the laundry basket. A separate basket-only illustration was not supplied, so `laundryBasket` remains an optional null asset. A null path keeps the labeled development placeholder visible.

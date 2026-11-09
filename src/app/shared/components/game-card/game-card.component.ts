@@ -1,10 +1,10 @@
 import { Component, Input } from '@angular/core';
-import { ArcadeButtonComponent } from '../arcade-button/arcade-button.component';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-game-card',
   standalone: true,
-  imports: [ArcadeButtonComponent],
+  imports: [RouterLink],
   templateUrl: './game-card.component.html',
   styleUrl: './game-card.component.scss',
 })

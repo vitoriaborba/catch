@@ -1,33 +1,138 @@
-<a class="back-link" routerLink="/"><span aria-hidden="true">&lt;</span> ARCADE FLOOR</a>
+@if (phase() === 'intro') {
+  <a class="back-link" routerLink="/"><span aria-hidden="true">&lt;</span> ARCADE FLOOR</a>
 
-<section class="intro-layout">
-  <div class="intro-copy">
-    <p class="eyebrow"><span></span> GAME 001 / THE GREAT SOCK EMERGENCY</p>
-    <h1>OH<br /><span>NO!</span></h1>
-    <div class="story">
-      <p class="story-alarm">A DARK DAY FOR PHILIPP.</p>
-      <p>A crisis has occurred.</p>
-      <p class="story-alarm">THIS IS NOT A DRILL.</p>
-      <p>Philipp needs a pair of clean socks. The remaining supply is insufficient.</p>
-      <p>The laundry situation is unacceptable.</p>
-      <p>Something must be done.</p>
-      <p class="story-alarm">THE FATE OF PHILIPP'S WELL-BEING IS IN YOUR HANDS.</p>
+  <section class="intro-layout">
+    <div class="intro-copy">
+      <p class="eyebrow"><span></span> GAME 001 / THE GREAT SOCK EMERGENCY</p>
+      <h1>OH<br /><span>NO!</span></h1>
+      <div class="story">
+        <p class="story-alarm">A DARK MOMENT FOR PHILIPP.</p>
+        <p>A crisis has occurred.</p>
+        <p class="story-alarm">THIS IS NOT A DRILL.</p>
+        <p>Philipp needs a pair of clean socks. The remaining supply is insufficient.</p>
+        <p>The laundry situation is unacceptable.</p>
+        <p>Something must be done.</p>
+        <p class="story-alarm">THE FATE OF PHILIPP'S WELL-BEING IS IN YOUR HANDS.</p>
+      </div>
+      <app-arcade-button (activated)="startGame()">LET'S BEGIN <span aria-hidden="true">&gt;</span></app-arcade-button>
     </div>
-    <app-arcade-button (activated)="showComingSoon = true">LET'S BEGIN <span aria-hidden="true">&gt;</span></app-arcade-button>
-    @if (showComingSoon) {
-      <output class="coming-message">GAME 001 IS ALMOST READY. THE PLAYFIELD IS COMING NEXT.</output>
-    }
-  </div>
-  <div class="incident-art">
-    <span class="incident-number">INCIDENT<br /><strong>001</strong></span>
-    <div class="wet-sock-frame"><app-asset-placeholder assetKey="philippWetSock" ratio="portrait" /></div>
-    <span class="incident-stamp">URGENT<br />LAUNDRY<br />MATTER</span>
-  </div>
-</section>
+    <div class="incident-art">
+      <span class="incident-number">INCIDENT<br /><strong>001</strong></span>
+      <div class="wet-sock-frame"><app-asset-placeholder assetKey="philippWetSock" ratio="portrait" /></div>
+      <span class="incident-stamp">SCHEIẞE</span>
+    </div>
+  </section>
 
-<section class="asset-line" aria-label="Temporary placeholders for future game artwork">
-  <app-asset-placeholder assetKey="philippGameCharacter" ratio="portrait" />
-  <app-asset-placeholder assetKey="blackSock" ratio="sock" />
-  <app-asset-placeholder assetKey="colourfulSock" ratio="sock" />
-  <app-asset-placeholder assetKey="laundryBasket" ratio="landscape" />
-</section>
+}
+
+@if (phase() === 'playing') {
+  <section class="game-screen" aria-label="The Great Sock Emergency gameplay">
+    <div class="game-hud">
+      <div class="hud-readout" aria-label="Time remaining">
+        <span>TIME</span>
+        <strong>{{ timeLeft().toString().padStart(2, '0') }}</strong>
+      </div>
+      <div class="hud-readout hud-readout--count" aria-label="Black socks collected">
+        <span>BLACK SOCKS</span>
+        <strong>{{ blackSockCount() }}</strong>
+      </div>
+      <div class="hud-readout hud-readout--count hud-readout--white" aria-label="White socks collected">
+        <span>WHITE SOCKS</span>
+        <strong>{{ whiteSockCount() }}</strong>
+      </div>
+    </div>
+
+    <div
+      #playfield
+      class="playfield"
+      aria-label="Sock-catching playfield"
+      (pointerdown)="startPointerMovement($event)"
+      (pointermove)="continuePointerMovement($event)"
+      (pointerup)="endPointerMovement($event)"
+      (pointercancel)="endPointerMovement($event)"
+      (lostpointercapture)="endPointerMovement($event)"
+    >
+      <span class="field-mark field-mark--left" aria-hidden="true">SOCK EMERGENCY / 001</span>
+      <span class="field-mark field-mark--right" aria-hidden="true">BLACK OR WHITE ONLY</span>
+      @for (sock of fallingSocks(); track sock.id) {
+        <div
+          class="falling-sock"
+          [class.falling-sock--colourful]="sock.kind === 'colourful'"
+          [class.falling-sock--white]="sock.kind === 'white'"
+          [style.left.%]="sock.x"
+          [style.top.%]="sock.y"
+          aria-hidden="true"
+        >
+          <app-asset-placeholder [assetKey]="sockAssetKey(sock)" ratio="sock" />
+        </div>
+      }
+      @if (speech()) {
+        <output class="speech-bubble" [style.left.%]="playerX()">{{ speech() }}</output>
+      }
+      <div #player class="player" [style.left.%]="playerX()">
+        <app-asset-placeholder assetKey="philippGameCharacter" ratio="portrait" />
+      </div>
+      <div class="catch-line" aria-hidden="true"></div>
+    </div>
+
+    <div class="control-row">
+      <p class="keyboard-hint">MOVE WITH <kbd>←</kbd> <kbd>→</kbd> OR <kbd>A</kbd> <kbd>D</kbd></p>
+      <p class="touch-hint">TOUCH AND DRAG TO MOVE</p>
+      <app-arcade-button class="game-exit" href="/" icon="×" />
+    </div>
+  </section>
+}
+
+@if (phase() === 'result') {
+  <section class="result-screen" aria-live="polite">
+    <p class="eyebrow"><span></span> GAME 001 / INCIDENT REPORT</p>
+    @switch (outcome()) {
+      @case ('protocol') {
+        <h1>PROTOCOL<br /><span>VIOLATION!</span></h1>
+        <div class="result-copy">
+          <p class="result-alarm">WHAT IS THIS?!</p>
+          <p>Philipp wears black or white socks. Always black or white socks.</p>
+          <p>There is a system. There are rules. There is absolutely no room for colourful socks.</p>
+          <p class="result-alarm">PHILIPP'S ENTIRE ORGANISATIONAL SYSTEM HAS COLLAPSED.</p>
+          <p class="character-quote">“I WOULD NEVER WEAR THAT!”</p>
+        </div>
+        <app-asset-placeholder class="result-art" assetKey="philippFailedTask" ratio="portrait" />
+        <div class="result-actions">
+          <app-arcade-button (activated)="startGame()">TRY AGAIN <span aria-hidden="true">&gt;</span></app-arcade-button>
+          <app-arcade-button href="/" icon="×" />
+        </div>
+      }
+      @case ('success') {
+        <h1>CRISIS AVERTED!</h1>
+        <div class="result-copy">
+          <p class="result-alarm">Well. That was unnecessarily stressful.</p>
+          <p>Against all odds, Philipp's sock supply has been successfully replenished.</p>
+          <p>Both feet are adequately equipped. The system is back to its optimal operating condition.</p>
+          <p>Philipp would like to thank you for doing what should have been a perfectly manageable task in the first place.</p>
+          <p class="result-alarm">YOU HAVE RESTORED HIS THERMAL EQUILIBRIUM. CONGRATULATIONS.</p>
+          <p class="character-quote"><em>Philipp can now return to his regularly scheduled activities.</em></p>
+        </div>
+        <app-asset-placeholder class="result-art" assetKey="philippTaskDone" ratio="portrait" />
+        <div class="result-actions">
+          <app-arcade-button (activated)="startGame()">PLAY AGAIN <span aria-hidden="true">&gt;</span></app-arcade-button>
+          <app-arcade-button href="/" icon="×" />
+        </div>
+      }
+      @case ('failure') {
+        <h1>CRITICAL SOCK<br /><span>IMBALANCE!</span></h1>
+        <div class="result-copy">
+          <p class="result-alarm">Wait a minute...</p>
+          <p>You've collected {{ blackSockCount() }} black socks and {{ whiteSockCount() }} white socks.</p>
+          <p>What exactly is Philipp supposed to do with an incomplete pair?!</p>
+          <p>Unfortunately, at least one foot remains unprotected.</p>
+          <p class="result-alarm">PHILIPP HAS DIED OF HYPOTHERMIA.</p>
+        </div>
+        <app-asset-placeholder class="result-art" assetKey="philippFailedTask" ratio="portrait" />
+        <div class="result-actions">
+          <app-arcade-button (activated)="startGame()">TRY AGAIN <span aria-hidden="true">&gt;</span></app-arcade-button>
+          <app-arcade-button href="/" icon="×" />
+        </div>
+      }
+    }
+  </section>
+}

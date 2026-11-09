@@ -1,5 +1,10 @@
 @if (href) {
-  <a class="arcade-button" [routerLink]="href"><ng-content /></a>
+  <a class="arcade-button" [routerLink]="href">
+    @if (icon) {
+      <span class="arcade-icon" aria-hidden="true">{{ icon }}</span>
+    }
+    {{ label }}
+  </a>
 } @else {
   <button class="arcade-button" type="button" [disabled]="disabled" (click)="activated.emit()">
     <ng-content />
