@@ -85,6 +85,9 @@
 
 @if (phase() === 'result') {
   <section class="result-screen" aria-live="polite">
+    @if (outcome() === 'protocol' && speech()) {
+      <output class="speech-bubble protocol-reaction">{{ speech() }}</output>
+    }
     <p class="eyebrow"><span></span> GAME 001 / INCIDENT REPORT</p>
     @switch (outcome()) {
       @case ('protocol') {

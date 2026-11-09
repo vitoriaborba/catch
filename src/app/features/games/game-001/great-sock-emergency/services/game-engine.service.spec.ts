@@ -51,21 +51,17 @@ describe('GameEngineService', () => {
   });
 
   it('keeps the colourful-sock outcome priority on the exact time boundary', () => {
-    let randomIndex = 0;
-    const randomValues = [0, 0, 0, 1];
-    vi.spyOn(Math, 'random').mockImplementation(() => randomValues[randomIndex++ % randomValues.length]);
     const engine = new GameEngineService(defaultProbabilities);
     engine.start(0);
+    Object.assign(engine, {
+      socks: [{ id: 1, kind: 'colourful', variant: 'red', x: 8, y: 77, speed: 30 }],
+    });
 
-    for (let now = 100; now < 30_000; now += 100) {
-      engine.tick(now, 50);
-    }
     const result = engine.tick(30_000, 8);
 
     expect(result.remainingSeconds).toBe(0);
     expect(result.caughtColourful).toBe(true);
     expect(result.outcome).toBe('protocol');
-    vi.restoreAllMocks();
   });
 
   it('counts caught black socks and gives missed black socks no penalty', () => {
@@ -130,6 +126,17 @@ describe('GameEngineService', () => {
 
     expect(kinds).toEqual(['colourful', 'black', 'white']);
     expect(variants).toEqual(['blue', null, null]);
+    vi.restoreAllMocks();
+  });
+
+  it('spawns socks at the slower fall speed', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    const engine = new GameEngineService(blackOnlyProbabilities);
+    engine.start(0);
+
+    const sock = engine.tick(820, 50).socks[0];
+
+    expect(sock.speed).toBe(26);
     vi.restoreAllMocks();
   });
 

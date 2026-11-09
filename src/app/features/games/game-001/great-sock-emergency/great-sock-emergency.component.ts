@@ -5,12 +5,13 @@ import { AssetPlaceholderComponent } from '../../../../shared/components/asset-p
 import { ArcadeButtonComponent } from '../../../../shared/components/arcade-button/arcade-button.component';
 import { FallingSock, GameOutcome } from './models/sock.model';
 import { BasketHitbox, GameEngineService } from './services/game-engine.service';
+import { SpeechMessageService } from './services/speech-message.service';
 
 @Component({
   selector: 'app-great-sock-emergency',
   standalone: true,
   imports: [AssetPlaceholderComponent, ArcadeButtonComponent, RouterLink],
-  providers: [GameEngineService],
+  providers: [GameEngineService, SpeechMessageService],
   templateUrl: './great-sock-emergency.component.html',
   styleUrl: './great-sock-emergency.component.scss',
 })
@@ -27,22 +28,25 @@ export class GreatSockEmergencyComponent implements OnDestroy {
   protected readonly speech = signal<string | null>(null);
   protected readonly outcome = signal<GameOutcome | null>(null);
 
-  private readonly idleMessages = [
-    "I'M STARTING TO LOSE FEELING IN MY TOES...",
-    'THIS LAUNDRY SITUATION IS GETTING OUT OF HAND.',
-  ];
   private readonly heldKeys = new Set<string>();
   private keyboardDirection = 0;
   private activePointerId: number | null = null;
   private frameId: number | null = null;
   private lastFrameAt = 0;
-  private lastSpeechAt = 0;
+  private nextIdleAt = 0;
   private speechTimeout: ReturnType<typeof setTimeout> | null = null;
 
-  constructor(private readonly gameEngine: GameEngineService) {}
+  constructor(
+    private readonly gameEngine: GameEngineService,
+    private readonly speechMessages: SpeechMessageService,
+  ) {}
 
   protected startGame(): void {
     this.stopFrame();
+    if (this.speechTimeout !== null) {
+      clearTimeout(this.speechTimeout);
+      this.speechTimeout = null;
+    }
     const now = performance.now();
     this.gameEngine.start(now);
     this.phase.set('playing');
@@ -54,7 +58,7 @@ export class GreatSockEmergencyComponent implements OnDestroy {
     this.outcome.set(null);
     this.speech.set(null);
     this.lastFrameAt = now;
-    this.lastSpeechAt = now;
+    this.scheduleNextIdle(now);
     this.clearDirections();
     this.frameId = requestAnimationFrame(this.advanceGame);
   }
@@ -145,7 +149,7 @@ export class GreatSockEmergencyComponent implements OnDestroy {
 
     const deltaSeconds = Math.min((now - this.lastFrameAt) / 1000, 0.05);
     this.lastFrameAt = now;
-    this.playerX.update((position) => Math.max(14, Math.min(86, position + this.keyboardDirection * 58 * deltaSeconds)));
+    this.playerX.update((position) => this.clampPlayerX(position + this.keyboardDirection * 58 * deltaSeconds));
 
     const tick = this.gameEngine.tick(now, this.playerX(), this.getBasketHitbox());
     this.timeLeft.set(tick.remainingSeconds);
@@ -153,14 +157,7 @@ export class GreatSockEmergencyComponent implements OnDestroy {
     this.whiteSockCount.set(tick.whiteSockCount);
     this.fallingSocks.set(tick.socks);
 
-    if (tick.caughtBlack || tick.caughtWhite) {
-      this.showSpeech(tick.blackSockCount >= 5 ? 'EXCELLENT. MY FEET THANK YOU.' : 'YES! A perfectly acceptable sock!', now);
-    } else if (tick.missedAcceptableSock) {
-      this.showSpeech('NO! COME BACK!', now);
-    } else if (now - this.lastSpeechAt >= 9000) {
-      const message = this.idleMessages[Math.floor(Math.random() * this.idleMessages.length)];
-      this.showSpeech(message, now);
-    }
+    this.handleSpeechEvents(tick, now);
 
     if (tick.outcome) {
       this.outcome.set(tick.outcome);
@@ -173,13 +170,62 @@ export class GreatSockEmergencyComponent implements OnDestroy {
     this.frameId = requestAnimationFrame(this.advanceGame);
   };
 
+  private handleSpeechEvents(tick: ReturnType<GameEngineService['tick']>, now: number): void {
+    const sockEventOccurred = tick.caughtColourful
+      || tick.caughtBlack
+      || tick.caughtWhite
+      || tick.missedAcceptableSock;
+
+    if (sockEventOccurred) {
+      this.scheduleNextIdle(now);
+    }
+
+    if (tick.caughtColourful) {
+      this.showCategoryMessage('colourfulCatch', now);
+      return;
+    }
+
+    if (tick.caughtBlack || tick.caughtWhite) {
+      const sockCount = tick.blackSockCount + tick.whiteSockCount;
+      this.showCategoryMessage(sockCount >= 5 ? 'streak' : 'acceptableCatch', now);
+      return;
+    }
+
+    if (tick.missedAcceptableSock) {
+      this.showCategoryMessage('miss', now);
+      return;
+    }
+
+    if (this.isPlayerMoving() && now >= this.nextIdleAt) {
+      this.showCategoryMessage('idle', now);
+      this.scheduleNextIdle(now);
+    }
+  }
+
+  private isPlayerMoving(): boolean {
+    return this.keyboardDirection !== 0 || this.activePointerId !== null;
+  }
+
+  private showCategoryMessage(
+    category: Parameters<SpeechMessageService['getMessage']>[0],
+    now: number,
+  ): void {
+    const message = this.speechMessages.getMessage(category);
+    if (message) {
+      this.showSpeech(message, now);
+    }
+  }
+
   private showSpeech(message: string, now: number): void {
     this.speech.set(message);
-    this.lastSpeechAt = now;
     if (this.speechTimeout !== null) {
       clearTimeout(this.speechTimeout);
     }
-    this.speechTimeout = setTimeout(() => this.speech.set(null), 2200);
+    this.speechTimeout = setTimeout(() => this.speech.set(null), this.speechMessages.getDisplayDurationMs());
+  }
+
+  private scheduleNextIdle(now: number): void {
+    this.nextIdleAt = now + this.speechMessages.getNextIdleDelayMs();
   }
 
   private getBasketHitbox(): BasketHitbox {
@@ -214,7 +260,20 @@ export class GreatSockEmergencyComponent implements OnDestroy {
 
     const fieldRect = field.getBoundingClientRect();
     const position = ((clientX - fieldRect.left) / fieldRect.width) * 100;
-    this.playerX.set(Math.max(14, Math.min(86, position)));
+    this.playerX.set(this.clampPlayerX(position));
+  }
+
+  private clampPlayerX(position: number): number {
+    const field = this.playfieldElement?.nativeElement;
+    const player = this.playerElement?.nativeElement;
+    if (!field || !player) {
+      return Math.max(14, Math.min(86, position));
+    }
+
+    const fieldWidth = field.getBoundingClientRect().width;
+    const playerHalfWidth = player.getBoundingClientRect().width / 2;
+    const edgeInset = playerHalfWidth / fieldWidth * 100;
+    return Math.max(edgeInset, Math.min(100 - edgeInset, position));
   }
 
   private updateKeyboardDirection(): void {

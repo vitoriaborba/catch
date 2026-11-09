@@ -179,7 +179,7 @@ export class GameEngineService {
       variant,
       x: 8 + Math.random() * 84,
       y: -8,
-      speed: 25 + Math.random() * 15,
+      speed: 20 + Math.random() * 12,
     };
   }
 
