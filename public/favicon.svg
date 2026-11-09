@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <rect x="4" y="4" width="42" height="42" fill="#45b9ff" />
+  <rect x="1" y="1" width="42" height="42" fill="#080e1b" stroke="#ffd35a" stroke-width="2" />
+  <text x="22" y="20" fill="#ffd35a" font-family="Impact, Arial Narrow, sans-serif" font-size="20" font-weight="700" text-anchor="middle">P</text>
+  <text x="22" y="39" fill="#ff7654" font-family="Impact, Arial Narrow, sans-serif" font-size="20" font-weight="700" text-anchor="middle">!</text>
+</svg>

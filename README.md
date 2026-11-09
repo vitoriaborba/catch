@@ -36,6 +36,12 @@ ng build
 
 This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
 
+## Deploying to GitHub Pages
+
+This repository deploys automatically from `main` using GitHub Actions. Rename the GitHub repository to `p-arcade`, then open **Settings → Pages** and set **Source** to **GitHub Actions**. The workflow builds the app with the repository subpath, adds a router fallback for direct links, and deploys the browser output.
+
+After the first successful workflow run, the site will be available at <https://vitoriaborba.github.io/p-arcade/>. Later pushes to `main` trigger a new deployment.
+
 ## Running unit tests
 
 To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
