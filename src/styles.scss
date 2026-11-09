@@ -1,0 +1,45 @@
+:root {
+	color-scheme: dark;
+	--night: #080e1b;
+	--panel: #101b2c;
+	--panel-raised: #17263b;
+	--line: #25364e;
+	--line-bright: #385273;
+	--grid-line: rgb(109 149 190 / 8%);
+	--text: #edf4fb;
+	--ink-soft: #a4b4c8;
+	--blue: #45b9ff;
+	--yellow: #ffd35a;
+	--orange: #ff7654;
+	font-family: 'Trebuchet MS', 'Courier New', sans-serif;
+	background: var(--night);
+	color: var(--text);
+	font-synthesis: none;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+* { box-sizing: border-box; }
+
+html { min-width: 320px; }
+
+@media (prefers-reduced-motion: no-preference) {
+	html { scroll-behavior: smooth; }
+}
+
+body {
+	min-width: 320px;
+	min-height: 100vh;
+	margin: 0;
+	background-color: var(--night);
+	background-image:
+		linear-gradient(rgb(66 116 166 / 4%) 1px, transparent 1px),
+		linear-gradient(90deg, rgb(66 116 166 / 4%) 1px, transparent 1px);
+	background-size: 36px 36px;
+}
+
+button,
+a { -webkit-tap-highlight-color: transparent; }
+
+::selection { background: var(--yellow); color: var(--night); }

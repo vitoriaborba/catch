@@ -1,0 +1,28 @@
+:host { display: inline-block; }
+
+.arcade-button {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 0 20px;
+  border: 0;
+  background: var(--yellow);
+  box-shadow: 4px 4px 0 var(--orange);
+  color: var(--night);
+  cursor: pointer;
+  font: 700 12px/1 'Courier New', monospace;
+  text-align: center;
+  text-decoration: none;
+  transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease;
+}
+
+.arcade-button:hover:not(:disabled) {
+  transform: translate(2px, 2px);
+  background: #ffe487;
+  box-shadow: 2px 2px 0 var(--orange);
+}
+
+.arcade-button:focus-visible { outline: 2px solid var(--text); outline-offset: 4px; }
+.arcade-button:disabled { cursor: not-allowed; opacity: 0.55; }

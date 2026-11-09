@@ -1,0 +1,11 @@
+<div class="asset-frame" [class]="'asset-frame asset-frame--' + ratio">
+  @if (asset.path) {
+    <img [src]="asset.path" [alt]="asset.label" />
+  } @else {
+    <div class="placeholder" role="img" [attr.aria-label]="asset.label + ' temporary asset placeholder'">
+      <span class="placeholder-cross" aria-hidden="true">+</span>
+      <span class="placeholder-label">{{ asset.label }}</span>
+      <span class="placeholder-caption">ARTWORK SLOT</span>
+    </div>
+  }
+</div>

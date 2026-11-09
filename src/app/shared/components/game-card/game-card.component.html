@@ -1,0 +1,10 @@
+<article class="game-card">
+  <div class="card-index"><span>GAME</span><strong>{{ number }}</strong></div>
+  <div class="card-content">
+    <p class="card-kicker">NOW PLAYING</p>
+    <h3>{{ title }}</h3>
+    <p class="card-description">{{ description }}</p>
+    <app-arcade-button [href]="href">PLAY NOW <span aria-hidden="true">&gt;</span></app-arcade-button>
+  </div>
+  <span class="card-corner" aria-hidden="true"></span>
+</article>

@@ -1,0 +1,48 @@
+:host { display: block; padding-bottom: 72px; }
+
+.back-link { display: inline-flex; align-items: center; gap: 10px; margin: 28px 0 10px; color: var(--ink-soft); font: 700 10px/1 'Courier New', monospace; text-decoration: none; }
+.back-link span { color: var(--blue); }
+.back-link:focus-visible { outline: 2px solid var(--yellow); outline-offset: 4px; }
+
+.intro-layout {
+  display: grid;
+  min-height: 500px;
+  grid-template-columns: 1fr 0.8fr;
+  align-items: center;
+  gap: 64px;
+  padding: 28px 44px 48px;
+  border-bottom: 1px solid var(--line);
+}
+
+.eyebrow { display: flex; align-items: center; gap: 10px; margin: 0 0 18px; color: var(--blue); font: 700 10px/1.5 'Courier New', monospace; }
+.eyebrow span { width: 7px; aspect-ratio: 1; background: var(--orange); }
+h1 { margin: 0 0 20px; color: var(--text); font: 700 clamp(66px, 10vw, 116px)/0.77 Impact, 'Arial Narrow', sans-serif; }
+h1 span { color: var(--yellow); }
+.story { max-width: 470px; margin-bottom: 24px; color: var(--ink-soft); font: 12px/1.65 'Courier New', monospace; }
+.story p { margin: 0 0 8px; }
+.story-alarm { color: var(--orange); font-weight: 700; }
+.coming-message { max-width: 350px; margin: 16px 0 0; color: var(--blue); font: 10px/1.6 'Courier New', monospace; }
+
+.incident-art { position: relative; width: min(100%, 360px); justify-self: center; padding: 28px 32px; border: 1px solid var(--line-bright); background: var(--panel); }
+.incident-art::before,
+.incident-art::after { position: absolute; z-index: 1; width: 20px; height: 20px; border-color: var(--yellow); border-style: solid; content: ''; pointer-events: none; }
+.incident-art::before { top: -4px; left: -4px; border-width: 2px 0 0 2px; }
+.incident-art::after { right: -4px; bottom: -4px; border-width: 0 2px 2px 0; }
+.incident-number { display: block; margin-bottom: 12px; color: var(--ink-soft); font: 9px/1.35 'Courier New', monospace; }
+.incident-number strong { color: var(--blue); font-size: 15px; }
+.wet-sock-frame { width: 100%; }
+.incident-stamp { position: absolute; right: -28px; bottom: 30px; padding: 7px 10px; border: 1px solid var(--orange); background: var(--night); color: var(--orange); font: 700 9px/1.35 'Courier New', monospace; text-align: center; transform: rotate(5deg); }
+
+.asset-line { display: grid; grid-template-columns: 1.2fr 0.55fr 0.55fr 1fr; align-items: stretch; gap: 14px; margin-top: 34px; }
+.asset-line app-asset-placeholder { max-width: 220px; }
+
+@media (max-width: 760px) {
+  .intro-layout { min-height: unset; grid-template-columns: 1fr; gap: 38px; padding: 28px 8px 44px; }
+  .incident-art { width: min(82%, 330px); }
+  .asset-line { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 440px) {
+  .asset-line { gap: 10px; }
+  .asset-line app-asset-placeholder { max-width: unset; }
+}

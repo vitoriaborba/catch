@@ -1,0 +1,33 @@
+<a class="back-link" routerLink="/"><span aria-hidden="true">&lt;</span> ARCADE FLOOR</a>
+
+<section class="intro-layout">
+  <div class="intro-copy">
+    <p class="eyebrow"><span></span> GAME 001 / THE GREAT SOCK EMERGENCY</p>
+    <h1>OH<br /><span>NO!</span></h1>
+    <div class="story">
+      <p class="story-alarm">A DARK DAY FOR PHILIPP.</p>
+      <p>A crisis has occurred.</p>
+      <p class="story-alarm">THIS IS NOT A DRILL.</p>
+      <p>Philipp needs a pair of clean socks. The remaining supply is insufficient.</p>
+      <p>The laundry situation is unacceptable.</p>
+      <p>Something must be done.</p>
+      <p class="story-alarm">THE FATE OF PHILIPP'S WELL-BEING IS IN YOUR HANDS.</p>
+    </div>
+    <app-arcade-button (activated)="showComingSoon = true">LET'S BEGIN <span aria-hidden="true">&gt;</span></app-arcade-button>
+    @if (showComingSoon) {
+      <output class="coming-message">GAME 001 IS ALMOST READY. THE PLAYFIELD IS COMING NEXT.</output>
+    }
+  </div>
+  <div class="incident-art">
+    <span class="incident-number">INCIDENT<br /><strong>001</strong></span>
+    <div class="wet-sock-frame"><app-asset-placeholder assetKey="philippWetSock" ratio="portrait" /></div>
+    <span class="incident-stamp">URGENT<br />LAUNDRY<br />MATTER</span>
+  </div>
+</section>
+
+<section class="asset-line" aria-label="Temporary placeholders for future game artwork">
+  <app-asset-placeholder assetKey="philippGameCharacter" ratio="portrait" />
+  <app-asset-placeholder assetKey="blackSock" ratio="sock" />
+  <app-asset-placeholder assetKey="colourfulSock" ratio="sock" />
+  <app-asset-placeholder assetKey="laundryBasket" ratio="landscape" />
+</section>
