@@ -1,0 +1,81 @@
+<section class="fortune-section" aria-labelledby="fortune-title">
+  <div class="fortune-heading">
+    <p class="eyebrow"><span></span> DAILY SIDE QUEST / 001</p>
+    <h2 id="fortune-title">PHILIPP'S DAILY FORTUNE</h2>
+  </div>
+
+  <div class="fortune-layout">
+    <div class="fortune-copy">
+      <p>Help Philipp get rid of his ridiculous fortune cookie collection.</p>
+      <p>Open a cookie and discover what fate has in store for you.</p>
+      <p class="fortune-tagline"><em>One cookie at a time keeps the cupboard clutter away.</em></p>
+
+      <div class="fortune-inventory" aria-live="polite">
+        <span>ESTIMATED COOKIES REMAINING</span>
+        <strong>{{ remainingCookies() }}</strong>
+        <small>An unofficial estimate. Philipp hasn't counted them.</small>
+      </div>
+
+      @if (remainingCookies() === 0) {
+        <div class="fortune-finished" role="status">
+          <strong>CONGRATULATIONS!</strong>
+          <p>Philipp's cupboard is finally free.</p>
+        </div>
+      } @else {
+        <app-arcade-button [disabled]="state() === 'opening'" (activated)="openCookie()">
+          {{ state() === 'opening' ? 'OPENING...' : state() === 'revealed' ? 'OPEN ANOTHER COOKIE' : 'OPEN A COOKIE' }}
+        </app-arcade-button>
+        @if (state() === 'revealed') {
+          <p class="fortune-confirmation">One less cookie in the cupboard. We're making progress.</p>
+        }
+      }
+
+      @if (errorMessage()) {
+        <p class="fortune-error" role="alert">{{ errorMessage() }}</p>
+      }
+    </div>
+
+    <div class="fortune-visual-column">
+      <div
+        class="fortune-visual"
+        [class.fortune-visual--opening]="state() === 'opening'"
+        [class.fortune-visual--revealing]="state() === 'opening' && revealStarted()"
+        [class.fortune-visual--revealed]="state() === 'revealed' && revealStarted()"
+        [attr.aria-busy]="state() === 'opening'"
+      >
+        <div class="fortune-artwork">
+          <img
+            class="fortune-cookie fortune-cookie--closed"
+            src="assets/fortune/closed-fortune-cookie.png"
+            alt="A closed fortune cookie"
+          />
+          @if (revealStarted() && fortune()) {
+            <img
+              class="fortune-cookie fortune-cookie--open"
+              src="assets/fortune/open-fortune-cookie.png"
+              alt="An opened fortune cookie with its fortune paper"
+            />
+          }
+        </div>
+      </div>
+      <div class="fortune-counter-stamp" aria-hidden="true">COOKIE<br />RECLAMATION</div>
+    </div>
+  </div>
+
+  @if (showFortunePopup() && fortune()) {
+    <div class="fortune-popup-backdrop" (click)="closeFortunePopup()">
+      <section
+        class="fortune-popup"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="fortune-popup-title"
+        (click)="$event.stopPropagation()"
+      >
+        <p class="fortune-popup-kicker">PHILIPP'S DAILY FORTUNE</p>
+        <h3 id="fortune-popup-title">YOUR FORTUNE</h3>
+        <p class="fortune-popup-message">{{ fortune() }}</p>
+        <app-arcade-button (activated)="closeFortunePopup()">CLOSE</app-arcade-button>
+      </section>
+    </div>
+  }
+</section>
