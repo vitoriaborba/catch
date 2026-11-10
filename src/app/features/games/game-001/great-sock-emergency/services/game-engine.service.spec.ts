@@ -18,7 +18,7 @@ describe('GameEngineService', () => {
   });
 
   it('validates each sock colour as an independent pair', () => {
-    expect(evaluateSockOutcome(0, 0)).toBe('success');
+    expect(evaluateSockOutcome(0, 0)).toBe('failure');
     expect(evaluateSockOutcome(2, 0)).toBe('success');
     expect(evaluateSockOutcome(0, 4)).toBe('success');
     expect(evaluateSockOutcome(1, 0)).toBe('failure');
@@ -54,6 +54,7 @@ describe('GameEngineService', () => {
     const engine = new GameEngineService(defaultProbabilities);
     engine.start(0);
     Object.assign(engine, {
+      startedAt: 0,
       socks: [{ id: 1, kind: 'colourful', variant: 'red', x: 8, y: 77, speed: 30 }],
     });
 
@@ -105,7 +106,7 @@ describe('GameEngineService', () => {
     expect(result.blackSockCount).toBe(0);
     expect(result.whiteSockCount).toBe(1);
     expect(evaluateSockOutcome(result.blackSockCount, result.whiteSockCount)).toBe('failure');
-    expect(evaluateSockOutcome(0, 0)).toBe('success');
+    expect(evaluateSockOutcome(0, 0)).toBe('failure');
     vi.restoreAllMocks();
   });
 
@@ -140,18 +141,52 @@ describe('GameEngineService', () => {
     vi.restoreAllMocks();
   });
 
-  it('ends at thirty seconds and evaluates both collected counts', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0.99);
+  it('keeps spawning without starting the countdown until an acceptable catch', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    const engine = new GameEngineService(blackOnlyProbabilities);
+    engine.start(0);
+
+    let result = engine.tick(0, 0);
+    for (let now = 100; now <= 60_000; now += 100) {
+      result = engine.tick(now, 0);
+    }
+
+    expect(result.remainingSeconds).toBe(30);
+    expect(result.outcome).toBeNull();
+    expect(result.blackSockCount).toBe(0);
+    expect(result.whiteSockCount).toBe(0);
+    expect(result.socks.length).toBeGreaterThan(0);
+    vi.restoreAllMocks();
+  });
+
+  it.each(['black', 'white'] as const)('starts thirty seconds on the first %s catch and resets on replay', (kind) => {
     const engine = new GameEngineService(defaultProbabilities);
-    engine.start(1000);
+    engine.start(0);
+    Object.assign(engine, {
+      socks: [{ id: 1, kind, variant: null, x: 50, y: 77, speed: 30 }],
+    });
+
+    const firstCatch = engine.tick(1000, 50);
+    expect(firstCatch.blackSockCount + firstCatch.whiteSockCount).toBe(1);
+    expect(firstCatch.remainingSeconds).toBe(30);
+    expect(engine.tick(2000, 0).remainingSeconds).toBe(29);
+
+    Object.assign(engine, {
+      socks: [{ id: 2, kind, variant: null, x: 50, y: 77, speed: 30 }],
+    });
+    engine.tick(2100, 50);
 
     expect(engine.tick(30_999, 0).outcome).toBeNull();
     const result = engine.tick(31_000, 0);
 
     expect(result.remainingSeconds).toBe(0);
     expect(result.outcome).toBe('success');
-    expect(result.blackSockCount).toBe(0);
-    expect(result.whiteSockCount).toBe(0);
-    vi.restoreAllMocks();
+    expect(result.blackSockCount + result.whiteSockCount).toBe(2);
+
+    engine.start(40_000);
+    const replay = engine.tick(80_000, 0);
+    expect(replay.remainingSeconds).toBe(30);
+    expect(replay.outcome).toBeNull();
+    expect(replay.blackSockCount + replay.whiteSockCount).toBe(0);
   });
 });

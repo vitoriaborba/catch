@@ -44,7 +44,9 @@ export function evaluateSockOutcome(
   blackSockCount: number,
   whiteSockCount: number,
 ): Exclude<GameOutcome, 'protocol'> {
-  return blackSockCount % 2 === 0 && whiteSockCount % 2 === 0 ? 'success' : 'failure';
+  return blackSockCount + whiteSockCount > 0 && blackSockCount % 2 === 0 && whiteSockCount % 2 === 0
+    ? 'success'
+    : 'failure';
 }
 
 export function isWithinBasketCatchZone(sockX: number, sockY: number, hitbox: BasketHitbox): boolean {
@@ -57,7 +59,7 @@ export class GameEngineService {
   private readonly colourfulSockVariants: ColourfulSockVariant[] = ['red', 'green', 'blue', 'yellow'];
   private readonly durationMs = 30_000;
   private readonly spawnIntervalMs = 820;
-  private startedAt = 0;
+  private startedAt: number | null = null;
   private previousFrameAt = 0;
   private lastSpawnAt = 0;
   private nextSockId = 0;
@@ -72,7 +74,7 @@ export class GameEngineService {
   ) {}
 
   start(now: number): void {
-    this.startedAt = now;
+    this.startedAt = null;
     this.previousFrameAt = now;
     this.lastSpawnAt = now;
     this.nextSockId = 0;
@@ -84,7 +86,9 @@ export class GameEngineService {
 
   tick(now: number, playerX: number, basketHitbox?: BasketHitbox): GameTick {
     const activeBasketHitbox = basketHitbox ?? { ...DEFAULT_BASKET_HITBOX, centerX: playerX };
-    const remainingMs = Math.max(0, this.durationMs - (now - this.startedAt));
+    const remainingMs = this.startedAt === null
+      ? this.durationMs
+      : Math.max(0, this.durationMs - (now - this.startedAt));
     const remainingSeconds = Math.ceil(remainingMs / 1000);
 
     if (!this.active) {
@@ -100,6 +104,9 @@ export class GameEngineService {
     }
 
     const events = this.advanceSocks(deltaSeconds, activeBasketHitbox);
+    if (this.startedAt === null && (events.caughtBlack || events.caughtWhite)) {
+      this.startedAt = now;
+    }
     let outcome = events.outcome;
     if (outcome === null && remainingMs === 0) {
       this.active = false;
